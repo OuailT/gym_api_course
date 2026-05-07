@@ -1,7 +1,5 @@
 import 'dotenv/config';
-import connectDB from './config/db.js';
-import Gym from './models/Gym.js';
-import Review from './models/Review.js';
+import prisma from './config/prisma.js';
 
 const gyms = [
   {
@@ -29,17 +27,25 @@ const gyms = [
 
 const seedData = async () => {
   try {
-    await connectDB();
+    // Clear existing data
+    await prisma.review.deleteMany({});
+    await prisma.gym.deleteMany({});
 
-    await Gym.deleteMany({});
-    await Review.deleteMany({});
+    // Insert new gyms
+    for (const gym of gyms) {
+      await prisma.gym.create({
+        data: gym
+      });
+    }
+    
+    const count = await prisma.gym.count();
+    console.log(`✅ Successfully seeded ${count} gyms into PostgreSQL.`);
 
-    const createdGyms = await Gym.insertMany(gyms);
-    console.log(`✅ Successfully seeded ${createdGyms.length} gyms.`);
-
+    await prisma.$disconnect();
     process.exit(0);
   } catch (err: any) {
     console.error('❌ Error seeding data:', err.message);
+    await prisma.$disconnect();
     process.exit(1);
   }
 };

@@ -1,7 +1,5 @@
 import { Router, Request, Response } from 'express';
-import mongoose from 'mongoose';
-import Gym from '../models/Gym.js';
-import Review from '../models/Review.js';
+import prisma from '../config/prisma.js';
 import requireAuth from '../middleware/auth.js';
 
 const router = Router();
@@ -10,7 +8,9 @@ const router = Router();
 
 router.get('/', async (_req: Request, res: Response) => {
   try {
-    const gyms = await Gym.find().sort({ createdAt: -1 });
+    const gyms = await prisma.gym.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
     res.status(200).json(gyms);
   } catch (err: any) {
     res.status(500).json({ error: 'Server error', details: err.message });
@@ -20,18 +20,21 @@ router.get('/', async (_req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(404).json({ error: 'Gym not found' });
-    }
 
-    const gym = await Gym.findById(id).lean();
+    const gym = await prisma.gym.findUnique({
+      where: { id },
+      include: {
+        reviews: {
+          orderBy: { createdAt: 'desc' }
+        }
+      }
+    });
+
     if (!gym) {
       return res.status(404).json({ error: 'Gym not found' });
     }
 
-    const reviews = await Review.find({ gym: id }).sort({ createdAt: -1 });
-    
-    res.status(200).json({ ...gym, reviews });
+    res.status(200).json(gym);
   } catch (err: any) {
     res.status(500).json({ error: 'Server error', details: err.message });
   }
@@ -47,16 +50,17 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Name and address are required' });
     }
 
-    const newGym = new Gym({
-      name,
-      address,
-      description,
-      amenities,
-      imageUrl
+    const newGym = await prisma.gym.create({
+      data: {
+        name,
+        address,
+        description,
+        amenities: amenities || [],
+        imageUrl
+      }
     });
 
-    const savedGym = await newGym.save();
-    res.status(201).json(savedGym);
+    res.status(201).json(newGym);
   } catch (err: any) {
     res.status(500).json({ error: 'Server error', details: err.message });
   }
@@ -64,14 +68,10 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
 
 router.post('/:id/reviews', requireAuth, async (req: any, res: Response) => {
   try {
-    const gymId = req.params.id;
+    const gymId = req.params.id as string;
     const { rating, comment } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(gymId)) {
-      return res.status(404).json({ error: 'Gym not found' });
-    }
-
-    const gym = await Gym.findById(gymId);
+    const gym = await prisma.gym.findUnique({ where: { id: gymId } });
     if (!gym) {
       return res.status(404).json({ error: 'Gym not found' });
     }
@@ -80,16 +80,17 @@ router.post('/:id/reviews', requireAuth, async (req: any, res: Response) => {
       return res.status(400).json({ error: 'Rating is required' });
     }
 
-    const newReview = new Review({
-      gym: gymId,
-      rating,
-      comment,
-      authorSub: req.oidc.user.sub,
-      authorName: req.oidc.user.name || req.oidc.user.nickname || 'Anonymous'
+    const newReview = await prisma.review.create({
+      data: {
+        gymId,
+        rating: Number(rating),
+        comment,
+        authorSub: req.oidc.user.sub,
+        authorName: req.oidc.user.name || req.oidc.user.nickname || 'Anonymous'
+      }
     });
 
-    const savedReview = await newReview.save();
-    res.status(201).json(savedReview);
+    res.status(201).json(newReview);
   } catch (err: any) {
     res.status(500).json({ error: 'Server error', details: err.message });
   }

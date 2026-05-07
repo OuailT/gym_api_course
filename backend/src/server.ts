@@ -2,12 +2,8 @@ import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { auth } from 'express-openid-connect';
-import connectDB from './config/db.js';
 import gymRoutes from './routes/gymRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
-
-// ─── Connect to MongoDB ────────────────────────────────────────────────────────
-connectDB(); // Non-top-level await for compatibility if needed, or just let it run
 
 // ─── Express App ──────────────────────────────────────────────────────────────
 const app = express();
