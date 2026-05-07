@@ -65,12 +65,29 @@ function GymDetail() {
         </div>
       )}
 
-      {/* Reviews section – placeholder until protected routes are implemented */}
+      {/* Reviews section */}
       <div className="gym-detail-reviews">
-        <h2>Reviews</h2>
-        <p className="state-msg muted">
-          Reviews coming soon. Log in to be the first to review!
-        </p>
+        <h2>Reviews ({gym.reviews?.length || 0})</h2>
+        {gym.reviews?.length > 0 ? (
+          <ul className="review-list">
+            {gym.reviews.map((review) => (
+              <li key={review._id} className="review-item">
+                <div className="review-meta">
+                  <strong>{review.authorName}</strong>
+                  <span className="review-rating">{'⭐'.repeat(review.rating)}</span>
+                </div>
+                <p className="review-comment">{review.comment}</p>
+                <span className="review-date">
+                  {new Date(review.createdAt).toLocaleDateString()}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="state-msg muted">
+            No reviews yet. Be the first to review this gym!
+          </p>
+        )}
       </div>
     </section>
   );
