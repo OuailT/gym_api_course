@@ -2,8 +2,8 @@ import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { auth } from 'express-openid-connect';
-import gymRoutes from './routes/gymRoutes.js';
-import profileRoutes from './routes/profileRoutes.js';
+import gymRoutes from './routes/gymRoutes';
+import profileRoutes from './routes/profileRoutes';
 
 // ─── Express App ──────────────────────────────────────────────────────────────
 const app = express();

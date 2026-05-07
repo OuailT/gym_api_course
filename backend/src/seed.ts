@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import prisma from './config/prisma.js';
+import prisma from './config/prisma';
 
 const gyms = [
   {

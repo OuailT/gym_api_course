@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "Gym Review API backend with Express, MongoDB, and Auth0",
   "main": "src/server.ts",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "seed": "tsx src/seed.ts",
+    "db:push": "prisma db push",
     "start": "node dist/server.js",
     "build": "tsc"
   },

@@ -1,6 +1,6 @@
 # GymReview API
 
-A full-stack Gym Review application built with **Node.js / Express / MongoDB** on the backend and **React + Vite** on the frontend, secured with **Auth0**.
+A full-stack Gym Review application built with **Node.js / Express / PostgreSQL** (via Prisma) on the backend and **React + Vite** on the frontend, secured with **Auth0**.
 
 ---
 
@@ -8,21 +8,22 @@ A full-stack Gym Review application built with **Node.js / Express / MongoDB** o
 
 ```
 gym_api/
-├── backend/          # Express API
+├── backend/          # Express API (Prisma/PostgreSQL)
+│   ├── prisma/       # Prisma schema
+│   ├── generated/    # Generated Prisma client (git-ignored)
 │   ├── src/
-│   │   ├── config/   # MongoDB connection
+│   │   ├── config/   # Prisma initialization
 │   │   ├── middleware/  # Auth middleware
-│   │   ├── models/   # Mongoose schemas (Gym, Review)
 │   │   ├── routes/   # gymRoutes, profileRoutes
-│   │   └── server.js
+│   │   └── server.ts
 │   ├── .env.example
 │   └── package.json
-└── frontend/         # React + Vite SPA
+└── frontend/         # React + Vite SPA (TypeScript)
     ├── src/
     │   ├── components/  # Navbar
     │   ├── pages/       # Home, GymDetail, Profile
-    │   ├── App.jsx
-    │   └── main.jsx
+    │   ├── App.tsx
+    │   └── main.tsx
     ├── .env.example
     └── package.json
 ```
@@ -47,32 +48,23 @@ Fill in `.env`:
 | Variable | Description |
 |---|---|
 | `PORT` | Server port (default `3000`) |
-| `MONGODB_URI` | MongoDB connection string |
+| `DATABASE_URL` | PostgreSQL connection string (Neon or Local) |
 | `AUTH_SECRET` | Random secret ≥ 32 chars for session signing |
 | `AUTH_BASE_URL` | Backend base URL (e.g. `http://localhost:3000`) |
 | `AUTH_CLIENT_ID` | Auth0 application Client ID |
 | `AUTH_ISSUER_BASE_URL` | `https://<your-tenant>.auth0.com` |
 | `CLIENT_ORIGIN` | Frontend origin for CORS (e.g. `http://localhost:5173`) |
 
-### 3. Run dev server
+### 3. Initialize Database
+```bash
+npx prisma db push
+npm run seed
+```
+
+### 4. Run dev server
 ```bash
 npm run dev
 ```
-
-### Public Endpoints
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| `GET` | `/gyms` | Public | List all gyms |
-| `GET` | `/gyms/:id` | Public | Get a single gym (404 if not found) |
-
-### Protected Endpoints (skeleton)
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| `POST` | `/gyms` | Required | Create a gym |
-| `POST` | `/gyms/:id/reviews` | Required | Add a review |
-| `GET` | `/profile` | Required | Get current user info |
 
 ---
 
@@ -102,20 +94,10 @@ Fill in `.env`:
 npm run dev
 ```
 
-Opens at **http://localhost:5173**
-
 ---
 
 ## Auth0 Configuration
 
-1. Create a **Regular Web Application** in Auth0 for the backend (express-openid-connect).
-2. Create a **Single Page Application** in Auth0 for the frontend (@auth0/auth0-react).
-3. Add `http://localhost:5173` to **Allowed Callback URLs**, **Allowed Logout URLs**, and **Allowed Web Origins** in your Auth0 SPA settings.
-
----
-
-## Security Notes
-
-- CORS is restricted to `CLIENT_ORIGIN` only — **no wildcards**.
-- `.env` files are git-ignored and must **never** be committed.
-- Protected routes return `401 JSON` (not a redirect) when unauthenticated.
+1. Create a **Regular Web Application** in Auth0 for the backend.
+2. Create a **Single Page Application** in Auth0 for the frontend.
+3. Add `http://localhost:5173` to **Allowed Callback URLs**, **Allowed Logout URLs**, and **Allowed Web Origins**.
