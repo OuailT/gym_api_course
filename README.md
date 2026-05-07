@@ -47,10 +47,10 @@ Fill in `.env`:
 
 | Variable | Description |
 |---|---|
-| `PORT` | Server port (default `3000`) |
+| `PORT` | Server port (default `3001`) |
 | `DATABASE_URL` | PostgreSQL connection string (Neon or Local) |
 | `AUTH_SECRET` | Random secret ≥ 32 chars for session signing |
-| `AUTH_BASE_URL` | Backend base URL (e.g. `http://localhost:3000`) |
+| `AUTH_BASE_URL` | Backend base URL (e.g. `http://localhost:3001`) |
 | `AUTH_CLIENT_ID` | Auth0 application Client ID |
 | `AUTH_ISSUER_BASE_URL` | `https://<your-tenant>.auth0.com` |
 | `CLIENT_ORIGIN` | Frontend origin for CORS (e.g. `http://localhost:5173`) |
@@ -87,7 +87,7 @@ Fill in `.env`:
 |---|---|
 | `VITE_AUTH0_DOMAIN` | Auth0 domain (e.g. `your-tenant.auth0.com`) |
 | `VITE_AUTH0_CLIENT_ID` | Auth0 SPA Client ID |
-| `VITE_API_BASE_URL` | Backend URL (e.g. `http://localhost:3000`) |
+| `VITE_API_BASE_URL` | Backend URL (e.g. `http://localhost:3001`) |
 
 ### 3. Run dev server
 ```bash
