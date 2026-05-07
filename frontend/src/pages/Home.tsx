@@ -1,13 +1,22 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Home.css';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+interface Gym {
+  _id: string;
+  name: string;
+  address: string;
+  description?: string;
+  amenities: string[];
+  imageUrl?: string;
+}
 
-function Home() {
-  const [gyms, setGyms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'http://localhost:3000';
+
+const Home: React.FC = () => {
+  const [gyms, setGyms] = useState<Gym[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchGyms = async () => {
@@ -16,7 +25,7 @@ function Home() {
         if (!res.ok) throw new Error(`Server responded ${res.status}`);
         const data = await res.json();
         setGyms(data);
-      } catch (err) {
+      } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);

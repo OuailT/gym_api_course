@@ -1,3 +1,4 @@
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -5,7 +6,7 @@ import GymDetail from './pages/GymDetail';
 import Profile from './pages/Profile';
 import './App.css';
 
-function App() {
+const App: React.FC = () => {
   return (
     <div className="app-wrapper">
       <Navbar />

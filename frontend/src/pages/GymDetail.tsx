@@ -1,14 +1,32 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './GymDetail.css';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+interface Review {
+  _id: string;
+  rating: number;
+  comment: string;
+  authorName: string;
+  createdAt: string;
+}
 
-function GymDetail() {
-  const { id } = useParams();
-  const [gym, setGym] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+interface GymDetailData {
+  _id: string;
+  name: string;
+  address: string;
+  description?: string;
+  amenities: string[];
+  imageUrl?: string;
+  reviews: Review[];
+}
+
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'http://localhost:3000';
+
+const GymDetail: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [gym, setGym] = useState<GymDetailData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchGym = async () => {
@@ -18,21 +36,21 @@ function GymDetail() {
         if (!res.ok) throw new Error(`Server responded ${res.status}`);
         const data = await res.json();
         setGym(data);
-      } catch (err) {
+      } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchGym();
+    if (id) fetchGym();
   }, [id]);
 
   if (loading) return <p className="state-msg">Loading…</p>;
-  if (error)
+  if (error || !gym)
     return (
       <div className="state-msg error">
-        <p>{error}</p>
+        <p>{error || 'Gym not found'}</p>
         <Link to="/" className="btn btn-outline" style={{ marginTop: '1rem' }}>
           ← Back to all gyms
         </Link>
@@ -65,7 +83,6 @@ function GymDetail() {
         </div>
       )}
 
-      {/* Reviews section */}
       <div className="gym-detail-reviews">
         <h2>Reviews ({gym.reviews?.length || 0})</h2>
         {gym.reviews?.length > 0 ? (

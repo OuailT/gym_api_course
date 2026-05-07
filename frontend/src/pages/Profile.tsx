@@ -1,12 +1,13 @@
+import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import './Profile.css';
 
-function Profile() {
+const Profile: React.FC = () => {
   const { isAuthenticated, isLoading, user, loginWithRedirect } = useAuth0();
 
   if (isLoading) return <p className="state-msg">Loading…</p>;
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return (
       <div className="profile-guest">
         <p className="state-msg muted">You are not logged in.</p>

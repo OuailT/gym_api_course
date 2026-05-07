@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import Gym from './models/Gym.js';
 import Review from './models/Review.js';
@@ -32,16 +31,14 @@ const seedData = async () => {
   try {
     await connectDB();
 
-    // Clear existing data
     await Gym.deleteMany({});
     await Review.deleteMany({});
 
-    // Insert new gyms
     const createdGyms = await Gym.insertMany(gyms);
     console.log(`✅ Successfully seeded ${createdGyms.length} gyms.`);
 
     process.exit(0);
-  } catch (err) {
+  } catch (err: any) {
     console.error('❌ Error seeding data:', err.message);
     process.exit(1);
   }

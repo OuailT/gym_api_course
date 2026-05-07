@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { auth } from 'express-openid-connect';
 import connectDB from './config/db.js';
@@ -7,31 +7,29 @@ import gymRoutes from './routes/gymRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 
 // ─── Connect to MongoDB ────────────────────────────────────────────────────────
-await connectDB();
+connectDB(); // Non-top-level await for compatibility if needed, or just let it run
 
 // ─── Express App ──────────────────────────────────────────────────────────────
 const app = express();
 
-// ─── CORS – restricted to the Vite dev server only ────────────────────────────
+// ─── CORS ─────────────────────────────────────────────────────────────────────
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN, // e.g. http://localhost:5173
-    credentials: true,                 // allow cookies/auth headers
+    origin: process.env.CLIENT_ORIGIN,
+    credentials: true,
   })
 );
 
-// ─── Body Parser ──────────────────────────────────────────────────────────────
 app.use(express.json());
 
-// ─── Auth0 / express-openid-connect ───────────────────────────────────────────
+// ─── Auth0 ────────────────────────────────────────────────────────────────────
 const oidcConfig = {
-  authRequired: false,          // only specific routes require auth
+  authRequired: false,
   auth0Logout: true,
   secret: process.env.AUTH_SECRET,
   baseURL: process.env.AUTH_BASE_URL,
   clientID: process.env.AUTH_CLIENT_ID,
   issuerBaseURL: process.env.AUTH_ISSUER_BASE_URL,
-  // Return 401 instead of redirecting when a protected route is hit without auth
   errorOnRequiredAuth: true,
 };
 
@@ -41,9 +39,8 @@ app.use(auth(oidcConfig));
 app.use('/gyms', gymRoutes);
 app.use('/profile', profileRoutes);
 
-// Health-check
-app.get('/', (req, res) => {
-  res.json({ status: 'Gym API running 🏋️' });
+app.get('/', (_req: Request, res: Response) => {
+  res.json({ status: 'Gym API running 🏋️ (TypeScript edition)' });
 });
 
 // ─── Start Server ─────────────────────────────────────────────────────────────

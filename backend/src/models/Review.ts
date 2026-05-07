@@ -1,6 +1,16 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema, Model, Types } from 'mongoose';
 
-const reviewSchema = new mongoose.Schema(
+export interface IReview extends Document {
+  gym: Types.ObjectId;
+  rating: number;
+  comment?: string;
+  authorSub: string;
+  authorName: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const reviewSchema: Schema = new Schema(
   {
     gym: {
       type: mongoose.Schema.Types.ObjectId,
@@ -18,7 +28,6 @@ const reviewSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
-    // Auth0 user sub (e.g. "auth0|abc123")
     authorSub: {
       type: String,
       required: [true, 'Author sub is required'],
@@ -31,6 +40,6 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Review = mongoose.model('Review', reviewSchema);
+const Review: Model<IReview> = mongoose.model<IReview>('Review', reviewSchema);
 
 export default Review;

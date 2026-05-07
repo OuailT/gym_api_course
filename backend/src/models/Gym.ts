@@ -1,6 +1,16 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema, Model } from 'mongoose';
 
-const gymSchema = new mongoose.Schema(
+export interface IGym extends Document {
+  name: string;
+  address: string;
+  description?: string;
+  amenities: string[];
+  imageUrl?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const gymSchema: Schema = new Schema(
   {
     name: {
       type: String,
@@ -29,6 +39,6 @@ const gymSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Gym = mongoose.model('Gym', gymSchema);
+const Gym: Model<IGym> = mongoose.model<IGym>('Gym', gymSchema);
 
 export default Gym;
