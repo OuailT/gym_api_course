@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth0 } from '../context/AuthContext';
 import './Profile.css';
 
 const Profile: React.FC = () => {
@@ -11,12 +11,15 @@ const Profile: React.FC = () => {
     return (
       <div className="profile-guest">
         <p className="state-msg muted">You are not logged in.</p>
-        <button
-          className="btn btn-primary"
-          onClick={() => loginWithRedirect()}
-        >
-          Log in to view your profile
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+          <button
+            className="btn btn-primary"
+            onClick={() => loginWithRedirect()}
+          >
+            Log in
+          </button>
+          <a href="/" className="btn btn-outline">Exit / Go Back</a>
+        </div>
       </div>
     );
   }

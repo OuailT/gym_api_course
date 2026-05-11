@@ -15,12 +15,17 @@
   margin-bottom: 1rem;
   background: linear-gradient(135deg, white 0%, #666 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 .home-header .subtitle {
   font-size: 1.25rem;
   color: var(--text-muted);
+  opacity: 0;
+  transform: translateY(20px);
 }
 
 .gym-grid {
@@ -34,8 +39,11 @@
   border: 1px solid var(--border-color);
   border-radius: 24px;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.4s, box-shadow 0.4s;
   position: relative;
+  opacity: 0;
+  transform: translateY(40px);
+  cursor: pointer;
 }
 
 .gym-card:hover {
@@ -57,6 +65,10 @@
 
 .gym-card-body {
   padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .gym-card-name {
@@ -84,6 +96,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
+  justify-content: center;
 }
 
 .amenities li {
@@ -92,4 +105,12 @@
   border-radius: 100px;
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+.card-cta {
+  display: inline-block;
+  margin-top: 1.2rem;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.92rem;
+  border-radius: 10px;
 }

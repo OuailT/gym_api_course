@@ -19,8 +19,7 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  const gridRef = useRef<HTMLUListElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchGyms = async () => {
@@ -40,32 +39,25 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!loading && gyms.length > 0 && gridRef.current) {
-      const title = titleRef.current;
-      const cards = Array.from(gridRef.current.children);
+    if (!loading && gyms.length > 0 && containerRef.current) {
+      const h1 = containerRef.current.querySelector('h1');
+      const subtitle = containerRef.current.querySelector('.subtitle');
+      const cards = containerRef.current.querySelectorAll('.gym-card');
       
-      const tl = gsap.timeline();
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
       
-      if (title) {
-        tl.fromTo(title, 
-          { opacity: 0, y: -50 }, 
-          { opacity: 1, y: 0, duration: 1, ease: "power4.out" }
-        );
-      }
-
+      if (h1) tl.to(h1, { opacity: 1, y: 0, duration: 1 }, 0.2);
+      if (subtitle) tl.to(subtitle, { opacity: 1, y: 0, duration: 1 }, "-=0.8");
+      
       if (cards.length > 0) {
-        tl.fromTo(cards, 
-          { opacity: 0, scale: 0.9, y: 60 },
-          { 
-            opacity: 1, 
-            scale: 1, 
-            y: 0, 
-            duration: 0.8, 
-            stagger: 0.1, 
-            ease: "back.out(1.2)" 
-          }, 
-          "-=0.6"
-        );
+        tl.to(cards, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "back.out(1.2)"
+        }, "-=0.7");
       }
     }
   }, [loading, gyms]);
@@ -74,16 +66,16 @@ const Home: React.FC = () => {
   if (error) return <p className="state-msg error">Error: {error}</p>;
 
   return (
-    <section className="home">
+    <section className="home" ref={containerRef}>
       <div className="home-header">
-        <h1 ref={titleRef}>Discover Swedish Elite Gyms</h1>
+        <h1>Discover Swedish Elite Gyms</h1>
         <p className="subtitle">Premium training spaces across Sweden.</p>
       </div>
 
       {gyms.length === 0 ? (
         <p className="state-msg">Preparing the best spots for you...</p>
       ) : (
-        <ul className="gym-grid" ref={gridRef}>
+        <ul className="gym-grid">
           {gyms.map((gym) => (
             <li key={gym.id} className="gym-card">
               {gym.imageUrl && (
@@ -101,7 +93,7 @@ const Home: React.FC = () => {
                   ))}
                 </ul>
                 <Link to={`/gyms/${gym.id}`} className="btn btn-primary card-cta">
-                  Expore Modern Facilities
+                  Explore more
                 </Link>
               </div>
             </li>

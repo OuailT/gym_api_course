@@ -27,9 +27,22 @@ const oidcConfig = {
   clientID: process.env.AUTH_CLIENT_ID,
   issuerBaseURL: process.env.AUTH_ISSUER_BASE_URL,
   errorOnRequiredAuth: true,
+  routes: {
+    // Override default routes to redirect back to frontend
+    login: false,
+    logout: false,
+  }
 };
 
 app.use(auth(oidcConfig));
+
+app.get('/login', (req, res) => {
+  res.oidc.login({ returnTo: process.env.CLIENT_ORIGIN || 'http://localhost:5173' });
+});
+
+app.get('/logout', (req, res) => {
+  res.oidc.logout({ returnTo: process.env.CLIENT_ORIGIN || 'http://localhost:5173' });
+});
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/gyms', gymRoutes);

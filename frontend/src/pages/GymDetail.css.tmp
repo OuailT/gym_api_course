@@ -1,0 +1,15 @@
+.login-prompt {
+  text-align: center;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.login-prompt p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  max-width: 300px;
+  line-height: 1.5;
+}

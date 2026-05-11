@@ -15,13 +15,19 @@
 
 .navbar-brand {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.05em;
   background: linear-gradient(135deg, white, #666);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-right: 3rem;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
 }
 
 .navbar-links {
@@ -37,6 +43,8 @@
   transition: all 0.3s ease;
   position: relative;
   padding: 0.5rem 0;
+  text-decoration: none;
+  font-family: var(--font-body);
 }
 
 .navbar-links a:hover,
@@ -47,13 +55,20 @@
 .navbar-links a.active::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -4px;
   left: 0;
   right: 0;
-  height: 2px;
-  background: var(--primary-color);
-  box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.5);
+  height: 3px;
+  background: #3b82f6;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
   border-radius: 100px;
+  transform-origin: left;
+  animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 .navbar-auth {

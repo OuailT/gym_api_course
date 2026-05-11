@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth0 } from '../context/AuthContext';
 import { Link, NavLink } from 'react-router-dom';
 import './Navbar.css';
 
@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
   return (
     <header className="navbar">
       <Link to="/" className="navbar-brand">
-        🏋️ GymReview
+        GYMREVIEW
       </Link>
 
       <nav className="navbar-links">

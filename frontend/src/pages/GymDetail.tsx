@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth0 } from '../context/AuthContext';
 import { gsap } from 'gsap';
+import { toast } from 'react-hot-toast';
 import './GymDetail.css';
 
 interface Review {
@@ -26,7 +27,7 @@ const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'http://localh
 
 const GymDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { isAuthenticated, isLoading: authLoading } = useAuth0();
+  const { isAuthenticated, isLoading: authLoading, loginWithRedirect } = useAuth0();
   
   const [gym, setGym] = useState<GymDetailData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -62,10 +63,19 @@ const GymDetail: React.FC = () => {
 
   useEffect(() => {
     if (!loading && gym && containerRef.current) {
-      gsap.fromTo(containerRef.current.children, 
-        { opacity: 0, y: 30 }, 
-        { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" }
-      );
+      const main = containerRef.current.querySelector('.gym-detail-main');
+      const gridChildren = containerRef.current.querySelectorAll('.premium-card');
+      
+      const tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 0.8 } });
+      
+      if (main) tl.to(main, { opacity: 1, y: 0 });
+      if (gridChildren.length > 0) {
+        tl.to(gridChildren, { 
+          opacity: 1, 
+          y: 0, 
+          stagger: 0.1 
+        }, "-=0.6");
+      }
     }
   }, [loading, gym]);
 
@@ -90,6 +100,7 @@ const GymDetail: React.FC = () => {
       await fetchGym();
       setComment('');
       setRating(5);
+      toast.success('Review posted successfully! 🏋️');
       
       // Success animation for form
       if (formRef.current) {
@@ -97,6 +108,7 @@ const GymDetail: React.FC = () => {
       }
     } catch (err: any) {
       setSubmitError(err.message);
+      toast.error(err.message || 'Failed to post review');
     } finally {
       setSubmitting(false);
     }
@@ -179,8 +191,13 @@ const GymDetail: React.FC = () => {
               </div>
             ) : (
               <div className="login-prompt">
-                <p>Loved this gym? Share your thoughts.</p>
-                <Link to="/profile" className="btn btn-outline">Login to Review</Link>
+                <p>Loved this gym? Share your thoughts with the community.</p>
+                <button 
+                  onClick={() => loginWithRedirect()}
+                  className="btn btn-outline"
+                >
+                  Login to Post a Review
+                </button>
               </div>
             )}
           </div>
