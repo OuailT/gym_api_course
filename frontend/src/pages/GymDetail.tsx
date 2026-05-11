@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
+import { gsap } from 'gsap';
 import './GymDetail.css';
 
 interface Review {
@@ -37,6 +38,10 @@ const GymDetail: React.FC = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // GSAP Refs
+  const containerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+
   const fetchGym = async () => {
     try {
       const res = await fetch(`${API_BASE}/gyms/${id}`);
@@ -55,6 +60,15 @@ const GymDetail: React.FC = () => {
     if (id) fetchGym();
   }, [id]);
 
+  useEffect(() => {
+    if (!loading && gym && containerRef.current) {
+      gsap.fromTo(containerRef.current.children, 
+        { opacity: 0, y: 30 }, 
+        { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" }
+      );
+    }
+  }, [loading, gym]);
+
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -65,7 +79,7 @@ const GymDetail: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rating, comment }),
-        credentials: 'include', // CRITICAL for Auth0 session cookies
+        credentials: 'include',
       });
 
       if (!res.ok) {
@@ -73,10 +87,14 @@ const GymDetail: React.FC = () => {
         throw new Error(errData.error || 'Failed to submit review');
       }
 
-      // Refresh data
       await fetchGym();
       setComment('');
       setRating(5);
+      
+      // Success animation for form
+      if (formRef.current) {
+        gsap.to(formRef.current, { backgroundColor: 'rgba(74, 222, 128, 0.1)', duration: 0.3, yoyo: true, repeat: 1 });
+      }
     } catch (err: any) {
       setSubmitError(err.message);
     } finally {
@@ -84,7 +102,8 @@ const GymDetail: React.FC = () => {
     }
   };
 
-  if (loading || authLoading) return <p className="state-msg">Loading…</p>;
+  if (loading || authLoading) return <div className="loader-container"><div className="loader"></div></div>;
+  
   if (error || !gym)
     return (
       <div className="state-msg error">
@@ -96,86 +115,99 @@ const GymDetail: React.FC = () => {
     );
 
   return (
-    <section className="gym-detail">
+    <section className="gym-detail" ref={containerRef}>
       <Link to="/" className="back-link">← All Gyms</Link>
 
-      {gym.imageUrl && (
-        <img src={gym.imageUrl} alt={gym.name} className="gym-detail-img" />
-      )}
+      <div className="gym-detail-main">
+        {gym.imageUrl && (
+          <div className="gym-image-container">
+            <img src={gym.imageUrl} alt={gym.name} className="gym-detail-img" />
+            <div className="image-overlay"></div>
+          </div>
+        )}
 
-      <h1 className="gym-detail-name">{gym.name}</h1>
-      <p className="gym-detail-address">📍 {gym.address}</p>
-
-      {gym.description && (
-        <p className="gym-detail-desc">{gym.description}</p>
-      )}
-
-      {gym.amenities?.length > 0 && (
-        <div className="gym-detail-amenities">
-          <h2>Amenities</h2>
-          <ul>
-            {gym.amenities.map((a, idx) => (
-              <li key={idx}>✓ {a}</li>
-            ))}
-          </ul>
+        <div className="gym-info-content">
+          <h1 className="gym-detail-name">{gym.name}</h1>
+          <p className="gym-detail-address">📍 {gym.address}</p>
+          {gym.description && <p className="gym-detail-desc">{gym.description}</p>}
         </div>
-      )}
+      </div>
 
-      <div className="gym-review-section">
-        <div className="gym-detail-reviews">
-          <h2>Reviews ({gym.reviews?.length || 0})</h2>
-          
-          {isAuthenticated ? (
-            <div className="add-review-box">
-              <h3>Leave a Review</h3>
-              <form onSubmit={handleReviewSubmit}>
-                <div className="form-group">
-                  <label>Rating:</label>
-                  <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-                    {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} Stars</option>)}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Comment:</label>
-                  <textarea 
-                    value={comment} 
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="Tell us about your experience..."
-                    required
-                  />
-                </div>
-                {submitError && <p className="error-small">{submitError}</p>}
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? 'Submitting...' : 'Post Review'}
-                </button>
-              </form>
+      <div className="gym-detail-grid">
+        <div className="gym-detail-left">
+          {gym.amenities?.length > 0 && (
+            <div className="gym-detail-amenities premium-card">
+              <h2>Amenities</h2>
+              <div className="amenity-tags">
+                {gym.amenities.map((a, idx) => (
+                  <span key={idx} className="amenity-tag">✓ {a}</span>
+                ))}
+              </div>
             </div>
-          ) : (
-            <p className="login-prompt">
-              Login to leave a review!
-            </p>
           )}
 
-          {gym.reviews?.length > 0 ? (
-            <ul className="review-list">
-              {gym.reviews.map((review) => (
-                <li key={review.id} className="review-item">
-                  <div className="review-meta">
-                    <strong>{review.authorName}</strong>
-                    <span className="review-rating">{'⭐'.repeat(review.rating)}</span>
+          <div className="review-form-container premium-card" ref={formRef}>
+            {isAuthenticated ? (
+              <div className="add-review-box">
+                <h3>Post a Review</h3>
+                <form onSubmit={handleReviewSubmit} className="modern-form">
+                  <div className="form-group">
+                    <label>Rating</label>
+                    <div className="rating-select">
+                      {[5, 4, 3, 2, 1].map(n => (
+                        <label key={n} className={`rating-option ${rating === n ? 'active' : ''}`}>
+                          <input type="radio" value={n} checked={rating === n} onChange={() => setRating(n)} />
+                          {n} ★
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                  <p className="review-comment">{review.comment}</p>
-                  <span className="review-date">
-                    {new Date(review.createdAt).toLocaleDateString()}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="state-msg muted">
-              No reviews yet. Be the first to review this gym!
-            </p>
-          )}
+                  <div className="form-group">
+                    <label>Your Experience</label>
+                    <textarea 
+                      value={comment} 
+                      onChange={(e) => setComment(e.target.value)}
+                      placeholder="What did you think of this gym?"
+                      required
+                    />
+                  </div>
+                  {submitError && <p className="error-small">{submitError}</p>}
+                  <button type="submit" className="btn btn-primary submit-btn" disabled={submitting}>
+                    {submitting ? 'Sending...' : 'Post Review'}
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div className="login-prompt">
+                <p>Loved this gym? Share your thoughts.</p>
+                <Link to="/profile" className="btn btn-outline">Login to Review</Link>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="gym-detail-right">
+          <div className="gym-detail-reviews premium-card">
+            <h2>Reviews ({gym.reviews?.length || 0})</h2>
+            {gym.reviews?.length > 0 ? (
+              <ul className="review-list">
+                {gym.reviews.map((review) => (
+                  <li key={review.id} className="review-item">
+                    <div className="review-meta">
+                      <div className="reviewer-info">
+                        <strong>{review.authorName}</strong>
+                        <span className="review-date">{new Date(review.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <span className="review-stars">{'★'.repeat(review.rating)}</span>
+                    </div>
+                    <p className="review-comment">{review.comment}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="state-msg muted">No reviews yet. Be the first!</p>
+            )}
+          </div>
         </div>
       </div>
     </section>

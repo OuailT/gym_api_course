@@ -3,35 +3,43 @@ import prisma from './config/prisma';
 
 const gyms = [
   {
-    name: "Iron Paradise",
-    address: "123 Muscle Beach, CA",
-    description: "The ultimate training ground for serious athletes. Featuring top-tier equipment and a high-energy atmosphere.",
-    amenities: ["Free Weights", "Power Racks", "Sauna", "Juice Bar"],
-    imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1000"
+    name: "SATS Sveavägen",
+    address: "Sveavägen 100, 113 50 Stockholm, Sweden",
+    description: "Premium fitness center in the heart of Stockholm. State-of-the-art equipment, group classes, and personal training.",
+    amenities: ["Free Weights", "Yoga Studio", "Sauna", "Personal Trainers"],
+    imageUrl: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80&w=1200"
   },
   {
-    name: "Zenith Yoga & Wellness",
-    address: "456 Serenity Dr, NY",
-    description: "Find your balance in our peaceful studio. Offering Hatha, Vinyasa, and restorative yoga sessions.",
-    amenities: ["Yoga Mats Provided", "Changing Rooms", "Meditation Hall"],
-    imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1000"
+    name: "Friskis & Svettis City",
+    address: "Regeringsgatan 59, 111 56 Stockholm, Sweden",
+    description: "Inclusive and energetic atmosphere with a wide variety of workout styles and modern facilities.",
+    amenities: ["Spinning", "Olympic Racks", "Lounge", "Group Workouts"],
+    imageUrl: "https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&q=80&w=1200"
   },
   {
-    name: "Velocity CrossFit",
-    address: "789 Speed Way, TX",
-    description: "High-intensity functional training designed to push your limits. Join our thriving community.",
-    amenities: ["Rowing Machines", "Climbing Ropes", "Outdoor Area"],
-    imageUrl: "https://images.unsplash.com/photo-1534367507873-d2d7e24c797f?auto=format&fit=crop&q=80&w=1000"
+    name: "Nordic Wellness Avenyn",
+    address: "Kungsportsavenyn 33, 411 36 Göteborg, Sweden",
+    description: "One of Gothenburg's most popular gyms, featuring elite strength equipment and wellness areas.",
+    amenities: ["Crossfit Area", "Spa", "Solarium", "Kidz Club"],
+    imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=1200"
+  },
+  {
+    name: "Gymmet Stockholm",
+    address: "Sorterargatan 8, 162 50 Vällingby, Sweden",
+    description: "A specialized gym for those who take their strength training seriously. Open 24/7.",
+    amenities: ["Powerlifting Platforms", "Strongman Equipment", "Competition Benches"],
+    imageUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&q=80&w=1200"
   }
 ];
 
 const seedData = async () => {
   try {
-    // Clear existing data
+    // Clear existing data (this removes the "AuthGym" and old placeholders)
+    console.log('🗑️ Cleaning up old data...');
     await prisma.review.deleteMany({});
     await prisma.gym.deleteMany({});
 
-    // Insert new gyms
+    console.log('🌱 Seeding Swedish gyms...');
     for (const gym of gyms) {
       await prisma.gym.create({
         data: gym
@@ -39,7 +47,7 @@ const seedData = async () => {
     }
     
     const count = await prisma.gym.count();
-    console.log(`✅ Successfully seeded ${count} gyms into PostgreSQL.`);
+    console.log(`✅ Successfully seeded ${count} premium Swedish gyms into PostgreSQL.`);
 
     await prisma.$disconnect();
     process.exit(0);

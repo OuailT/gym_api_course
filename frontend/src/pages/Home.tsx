@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { gsap } from 'gsap';
 import './Home.css';
 
 interface Gym {
@@ -17,6 +18,9 @@ const Home: React.FC = () => {
   const [gyms, setGyms] = useState<Gym[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const gridRef = useRef<HTMLUListElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     const fetchGyms = async () => {
@@ -35,20 +39,46 @@ const Home: React.FC = () => {
     fetchGyms();
   }, []);
 
-  if (loading) return <p className="state-msg">Loading gyms…</p>;
+  useEffect(() => {
+    if (!loading && gyms.length > 0) {
+      const tl = gsap.timeline();
+      
+      if (titleRef.current) {
+        tl.from(titleRef.current, { 
+          opacity: 0, 
+          y: -50, 
+          duration: 1, 
+          ease: "power4.out" 
+        });
+      }
+
+      if (gridRef.current) {
+        tl.from(gridRef.current.children, {
+          opacity: 0,
+          scale: 0.9,
+          y: 60,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: "back.out(1.2)",
+        }, "-=0.6");
+      }
+    }
+  }, [loading, gyms]);
+
+  if (loading) return <div className="loader-container"><div className="loader"></div></div>;
   if (error) return <p className="state-msg error">Error: {error}</p>;
 
   return (
     <section className="home">
       <div className="home-header">
-        <h1>All Gyms</h1>
-        <p className="subtitle">Discover and review the best gyms near you.</p>
+        <h1 ref={titleRef}>Discover Swedish Elite Gyms</h1>
+        <p className="subtitle">Premium training spaces across Sweden.</p>
       </div>
 
       {gyms.length === 0 ? (
-        <p className="state-msg">No gyms found yet. Add the first one!</p>
+        <p className="state-msg">Preparing the best spots for you...</p>
       ) : (
-        <ul className="gym-grid">
+        <ul className="gym-grid" ref={gridRef}>
           {gyms.map((gym) => (
             <li key={gym.id} className="gym-card">
               {gym.imageUrl && (
@@ -60,15 +90,13 @@ const Home: React.FC = () => {
                 {gym.description && (
                   <p className="gym-card-desc">{gym.description}</p>
                 )}
-                {gym.amenities?.length > 0 && (
-                  <ul className="amenities">
-                    {gym.amenities.map((a) => (
-                      <li key={a}>{a}</li>
-                    ))}
-                  </ul>
-                )}
+                <ul className="amenities">
+                  {gym.amenities.slice(0, 3).map((a, i) => (
+                    <li key={i}>{a}</li>
+                  ))}
+                </ul>
                 <Link to={`/gyms/${gym.id}`} className="btn btn-primary card-cta">
-                  View Details →
+                  Expore Modern Facilities
                 </Link>
               </div>
             </li>

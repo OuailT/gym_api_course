@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
 
       <nav className="navbar-links">
         <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : '')}>
-          Gyms
+          Home
         </NavLink>
 
         {isAuthenticated && (
