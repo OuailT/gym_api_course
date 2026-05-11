@@ -40,27 +40,32 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!loading && gyms.length > 0) {
+    if (!loading && gyms.length > 0 && gridRef.current) {
+      const title = titleRef.current;
+      const cards = Array.from(gridRef.current.children);
+      
       const tl = gsap.timeline();
       
-      if (titleRef.current) {
-        tl.from(titleRef.current, { 
-          opacity: 0, 
-          y: -50, 
-          duration: 1, 
-          ease: "power4.out" 
-        });
+      if (title) {
+        tl.fromTo(title, 
+          { opacity: 0, y: -50 }, 
+          { opacity: 1, y: 0, duration: 1, ease: "power4.out" }
+        );
       }
 
-      if (gridRef.current) {
-        tl.from(gridRef.current.children, {
-          opacity: 0,
-          scale: 0.9,
-          y: 60,
-          duration: 0.8,
-          stagger: 0.15,
-          ease: "back.out(1.2)",
-        }, "-=0.6");
+      if (cards.length > 0) {
+        tl.fromTo(cards, 
+          { opacity: 0, scale: 0.9, y: 60 },
+          { 
+            opacity: 1, 
+            scale: 1, 
+            y: 0, 
+            duration: 0.8, 
+            stagger: 0.1, 
+            ease: "back.out(1.2)" 
+          }, 
+          "-=0.6"
+        );
       }
     }
   }, [loading, gyms]);
