@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import './Home.css';
 
 interface Gym {
-  _id: string;
+  id: string;
   name: string;
   address: string;
   description?: string;
@@ -11,7 +11,7 @@ interface Gym {
   imageUrl?: string;
 }
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'http://localhost:3000';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'http://localhost:3001';
 
 const Home: React.FC = () => {
   const [gyms, setGyms] = useState<Gym[]>([]);
@@ -50,7 +50,7 @@ const Home: React.FC = () => {
       ) : (
         <ul className="gym-grid">
           {gyms.map((gym) => (
-            <li key={gym._id} className="gym-card">
+            <li key={gym.id} className="gym-card">
               {gym.imageUrl && (
                 <img src={gym.imageUrl} alt={gym.name} className="gym-card-img" />
               )}
@@ -67,7 +67,7 @@ const Home: React.FC = () => {
                     ))}
                   </ul>
                 )}
-                <Link to={`/gyms/${gym._id}`} className="btn btn-primary card-cta">
+                <Link to={`/gyms/${gym.id}`} className="btn btn-primary card-cta">
                   View Details →
                 </Link>
               </div>
