@@ -90,10 +90,10 @@ A GitHub Actions pipeline is configured in `.github/workflows/test.yml` to run a
 
 ## Authentication
 
-We implemented **Auth0** using the `express-openid-connect` library for the backend and `@auth0/auth0-react` for the frontend.
+I implemented **Auth0** using the `express-openid-connect` library for the backend and `@auth0/auth0-react` for the frontend.
 
 ### Why Auth0?
-- **Session-based Security**: We chose session-based authentication over JWTs in localStorage because session cookies are significantly more resistant to XSS attacks.
+- **Session-based Security**: I chose session-based authentication over JWTs in localStorage because session cookies are significantly more resistant to XSS attacks.
 - **OAuth Complexity**: Auth0 abstracts the complexity of OAuth flows, identity providers, and user management.
 - **Seamless Integration**: `express-openid-connect` provides easy-to-use middleware for protecting routes and accessing user profiles.
 
@@ -119,7 +119,7 @@ We implemented **Auth0** using the `express-openid-connect` library for the back
 ## Reflections
 
 ### Implementation Choices
-- **PostgreSQL + Prisma**: We moved from MongoDB to PostgreSQL to leverage strict relational integrity and the powerful type-safety provided by Prisma client.
+- **PostgreSQL + Prisma**: I moved from MongoDB to PostgreSQL to leverage strict relational integrity and the powerful type-safety provided by Prisma client.
 - **Folder Structure**: Used a clear `src/routes`, `src/middleware`, and `src/config` separation in the backend to keep the `server.ts` clean and Maintainable.
 
 ### Challenges
