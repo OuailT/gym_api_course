@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { auth } from 'express-openid-connect';
+import { auth, ConfigParams } from 'express-openid-connect';
 import gymRoutes from './routes/gymRoutes';
 import profileRoutes from './routes/profileRoutes';
 
@@ -19,7 +19,7 @@ app.use(
 app.use(express.json());
 
 // ─── Auth0 ────────────────────────────────────────────────────────────────────
-const oidcConfig = {
+const oidcConfig: ConfigParams = {
   authRequired: false,
   auth0Logout: true,
   secret: process.env.AUTH_SECRET,
