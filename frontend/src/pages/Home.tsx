@@ -24,7 +24,9 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchGyms = async () => {
       try {
-        const res = await fetch(`${API_BASE}/gyms`);
+        const res = await fetch(`${API_BASE}/gyms`, {
+          credentials: 'include'
+        });
         if (!res.ok) throw new Error(`Server responded ${res.status}`);
         const data = await res.json();
         setGyms(data);

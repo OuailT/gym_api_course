@@ -60,6 +60,14 @@ app.get('/logout', (req, res) => {
 app.use('/gyms', gymRoutes);
 app.use('/profile', profileRoutes);
 
+app.get('/test-auth', (req, res) => {
+  res.json({ 
+    isAuth: req.oidc.isAuthenticated(), 
+    user: req.oidc.user || null,
+    cookies: req.headers.cookie || 'No cookies found'
+  });
+});
+
 app.get('/', (_req: Request, res: Response) => {
   res.json({ status: 'Gym API running 🏋️ (TypeScript edition)' });
 });

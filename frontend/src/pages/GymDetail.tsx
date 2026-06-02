@@ -45,7 +45,9 @@ const GymDetail: React.FC = () => {
 
   const fetchGym = async () => {
     try {
-      const res = await fetch(`${API_BASE}/gyms/${id}`);
+      const res = await fetch(`${API_BASE}/gyms/${id}`, {
+        credentials: 'include'
+      });
       if (res.status === 404) throw new Error('Gym not found');
       if (!res.ok) throw new Error(`Server responded ${res.status}`);
       const data = await res.json();
