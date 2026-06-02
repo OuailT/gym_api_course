@@ -1,4 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// 1. Mock the auth library BEFORE any other imports to prevent crash
+vi.mock('express-oauth2-jwt-bearer', () => ({
+  auth: vi.fn().mockReturnValue((req: any, res: any, next: any) => {
+    // Check for a test header we'll use in integration tests
+    const isAuth = req.headers['x-test-auth'] === 'true';
+    if (isAuth) {
+      req.auth = { 
+        payload: req.headers['x-test-user'] 
+          ? JSON.parse(req.headers['x-test-user'] as string) 
+          : { sub: 'auth0|123', name: 'Test User' } 
+      };
+      next();
+    } else {
+      res.status(401).json({ error: 'unauthorized' });
+    }
+  })
+}));
+
 import request from 'supertest';
 import express from 'express';
 import gymRoutes from '../src/routes/gymRoutes';
@@ -27,18 +46,6 @@ vi.mock('../src/config/prisma', () => ({
 // Create a test app instance
 const app = express();
 app.use(express.json());
-
-// Mock OIDC middleware
-app.use((req: any, res: any, next: any) => {
-  const isAuth = req.headers['x-test-auth'] === 'true';
-  const mockUser = req.headers['x-test-user'] ? JSON.parse(req.headers['x-test-user'] as string) : { sub: 'auth0|123', name: 'Test User' };
-  
-  req.oidc = {
-    isAuthenticated: () => isAuth,
-    user: isAuth ? mockUser : undefined
-  };
-  next();
-});
 
 app.use('/gyms', gymRoutes);
 app.use('/profile', profileRoutes);
