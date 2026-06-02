@@ -68,6 +68,15 @@ app.get('/test-auth', (req, res) => {
   });
 });
 
+app.get('/set-test-cookie', (req, res) => {
+  res.cookie('test_cookie', 'hello_world', {
+    sameSite: 'none',
+    secure: true,
+    httpOnly: true
+  });
+  res.json({ message: 'Test cookie set' });
+});
+
 app.get('/', (_req: Request, res: Response) => {
   res.json({ status: 'Gym API running 🏋️ (TypeScript edition)' });
 });
