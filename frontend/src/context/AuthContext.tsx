@@ -13,7 +13,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'http://localhost:3001';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'https://gym-api-course.onrender.com';
 
 export const Auth0Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

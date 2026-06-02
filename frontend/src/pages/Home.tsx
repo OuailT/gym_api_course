@@ -12,7 +12,7 @@ interface Gym {
   imageUrl?: string;
 }
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'http://localhost:3001';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'https://gym-api-course.onrender.com';
 
 const Home: React.FC = () => {
   const [gyms, setGyms] = useState<Gym[]>([]);

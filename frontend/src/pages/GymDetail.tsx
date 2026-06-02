@@ -23,7 +23,7 @@ interface GymDetailData {
   reviews: Review[];
 }
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'http://localhost:3001';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'https://gym-api-course.onrender.com';
 
 const GymDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
