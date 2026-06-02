@@ -27,7 +27,7 @@ const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'https://gym-a
 
 const GymDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { isAuthenticated, isLoading: authLoading, loginWithRedirect } = useAuth0();
+  const { isAuthenticated, isLoading: authLoading, loginWithRedirect, getAccessToken } = useAuth0();
   
   const [gym, setGym] = useState<GymDetailData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -45,9 +45,7 @@ const GymDetail: React.FC = () => {
 
   const fetchGym = async () => {
     try {
-      const res = await fetch(`${API_BASE}/gyms/${id}`, {
-        credentials: 'include'
-      });
+      const res = await fetch(`${API_BASE}/gyms/${id}`);
       if (res.status === 404) throw new Error('Gym not found');
       if (!res.ok) throw new Error(`Server responded ${res.status}`);
       const data = await res.json();
@@ -87,11 +85,14 @@ const GymDetail: React.FC = () => {
     setSubmitError(null);
 
     try {
+      const token = await getAccessToken();
       const res = await fetch(`${API_BASE}/gyms/${id}/reviews`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ rating, comment }),
-        credentials: 'include',
       });
 
       if (!res.ok) {

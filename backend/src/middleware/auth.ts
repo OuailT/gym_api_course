@@ -1,15 +1,15 @@
-import { Request, Response, NextFunction } from 'express';
+import { auth } from 'express-oauth2-jwt-bearer';
+import dotenv from 'dotenv';
+dotenv.config();
 
 /**
- * Custom auth middleware.
- * Returns 401 JSON instead of redirecting when the user is not authenticated.
+ * JWT Validation Middleware
+ * Validates the Access Token sent in the Authorization: Bearer <token> header.
  */
-const requireAuth = (req: any, res: Response, next: NextFunction) => {
-  // express-openid-connect adds oidc to req
-  if (!req.oidc || !req.oidc.isAuthenticated()) {
-    return res.status(401).json({ error: 'Unauthorized – please log in' });
-  }
-  next();
-};
+const requireAuth = auth({
+  audience: process.env.AUTH0_AUDIENCE,
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+  tokenSigningAlg: 'RS256'
+});
 
 export default requireAuth;

@@ -4,8 +4,8 @@ import requireAuth from '../middleware/auth';
 const router = Router();
 
 router.get('/', requireAuth, (req: any, res: Response) => {
-  console.log('Profile Route Cookies:', req.headers.cookie);
-  res.status(200).json({ user: req.oidc.user });
+  // req.auth contains the decoded JWT payload
+  res.status(200).json({ user: req.auth.payload });
 });
 
 export default router;

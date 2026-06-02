@@ -1,69 +1,84 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Auth0Provider as Provider, useAuth0 as useAuth0React } from '@auth0/auth0-react';
 import { toast } from 'react-hot-toast';
 
-// This context replaces the @auth0/auth0-react library to properly use the Backend's session cookies.
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   user: any | null;
   loginWithRedirect: () => void;
-  loginWithPopup: () => void; // mapped to redirect for simplicity
+  loginWithPopup: () => void;
   logout: (options?: any) => void;
+  getAccessToken: () => Promise<string | undefined>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? 'https://gym-api-course.onrender.com';
+const domain = import.meta.env.VITE_AUTH0_DOMAIN;
+const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+const audience = import.meta.env.VITE_API_BASE_URL; // Using API URL as audience
 
 export const Auth0Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const prevAuth = useRef(false);
+  return (
+    <Provider
+      domain={domain}
+      clientId={clientId}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: audience,
+        scope: "openid profile email"
+      }}
+      cacheLocation="localstorage"
+    >
+      <AuthProviderInner>{children}</AuthProviderInner>
+    </Provider>
+  );
+};
+
+const AuthProviderInner: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { 
+    isAuthenticated, 
+    isLoading, 
+    user, 
+    loginWithRedirect, 
+    loginWithPopup, 
+    logout, 
+    getAccessTokenSilently 
+  } = useAuth0React();
+
+  const [wasAuthenticated, setWasAuthenticated] = useState(false);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/profile`, {
-          credentials: 'include' // Must send cookies to the backend
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user);
-          setIsAuthenticated(true);
-          if (!prevAuth.current) {
-            toast.success(`Welcome back, ${data.user.nickname || data.user.name || 'User'}! 👋`);
-          }
-          prevAuth.current = true;
-        } else {
-          setIsAuthenticated(false);
-          prevAuth.current = false;
-        }
-      } catch (error) {
-        setIsAuthenticated(false);
-        prevAuth.current = false;
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchProfile();
-  }, []);
+    if (!isLoading && isAuthenticated && !wasAuthenticated) {
+      toast.success(`Welcome back, ${user?.nickname || user?.name || 'User'}! 👋`);
+      setWasAuthenticated(true);
+    }
+  }, [isAuthenticated, isLoading, user, wasAuthenticated]);
 
-  const loginWithRedirect = () => {
-    toast.loading('Redirecting to login...');
-    // Redirect browser to the Backend's login route
-    window.location.href = `${API_BASE}/login`;
+  const getAccessToken = async () => {
+    try {
+      return await getAccessTokenSilently();
+    } catch (e) {
+      console.error("Error getting access token", e);
+      return undefined;
+    }
   };
 
-  const loginWithPopup = loginWithRedirect; // Popups don't work well with cross-origin session cookies, redirecting instead
-
-  const logout = () => {
+  const logoutWithRedirect = () => {
     toast('Logging out...', { icon: '👋' });
-    window.location.href = `${API_BASE}/logout`;
+    logout({ logoutParams: { returnTo: window.location.origin } });
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, user, loginWithRedirect, loginWithPopup, logout }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated, 
+      isLoading, 
+      user, 
+      loginWithRedirect, 
+      loginWithPopup, 
+      logout: logoutWithRedirect,
+      getAccessToken
+    }}>
       {children}
     </AuthContext.Provider>
   );

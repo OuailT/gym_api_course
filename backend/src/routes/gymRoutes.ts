@@ -85,8 +85,8 @@ router.post('/:id/reviews', requireAuth, async (req: any, res: Response) => {
         gymId,
         rating: Number(rating),
         comment,
-        authorSub: req.oidc.user.sub,
-        authorName: req.oidc.user.name || req.oidc.user.nickname || 'Anonymous'
+        authorSub: req.auth.payload.sub,
+        authorName: req.auth.payload.name || req.auth.payload.nickname || 'Authenticated User'
       }
     });
 
