@@ -47,11 +47,13 @@ const oidcConfig: ConfigParams = {
 app.use(auth(oidcConfig));
 
 app.get('/login', (req, res) => {
-  res.oidc.login({ returnTo: process.env.CLIENT_ORIGIN || 'http://localhost:5173' });
+  const returnTo = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+  res.oidc.login({ returnTo });
 });
 
 app.get('/logout', (req, res) => {
-  res.oidc.logout({ returnTo: process.env.CLIENT_ORIGIN || 'http://localhost:5173' });
+  const returnTo = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+  res.oidc.logout({ returnTo });
 });
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
