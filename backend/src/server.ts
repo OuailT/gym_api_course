@@ -9,9 +9,12 @@ import profileRoutes from './routes/profileRoutes';
 const app = express();
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
+// Enable trust proxy for Heroku/Render to handle HTTPS correctly
+app.set('trust proxy', 1);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN,
+    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
     credentials: true,
   })
 );
@@ -31,6 +34,13 @@ const oidcConfig: ConfigParams = {
     // Override default routes to redirect back to frontend
     login: false,
     logout: false,
+  },
+  session: {
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    }
   }
 };
 
